@@ -3,6 +3,7 @@ package tableflip
 import (
 	"context"
 	"fmt"
+	"github.com/golang/glog"
 	"net"
 	"os"
 	"runtime"
@@ -122,6 +123,7 @@ func (f *Fds) ListenWithCallback(network, addr string, callback func(network, ad
 	}
 
 	if ln != nil {
+		glog.Infof("inherited listener %s:%s", network, addr)
 		return ln, nil
 	}
 
