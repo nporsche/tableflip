@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/golang/glog"
 	"io/ioutil"
 	"net"
 	"os"
@@ -216,6 +217,7 @@ func (u *Upgrader) run() {
 
 		case <-u.stopC:
 			u.Fds.closeAndRemoveUsed()
+			glog.Info("close and removed used")
 			return
 
 		case request := <-u.upgradeC:

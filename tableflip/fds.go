@@ -418,6 +418,7 @@ func (f *Fds) closeInherited() {
 			// Remove inherited but unused Unix sockets from the file system.
 			// This undoes the effect of SetUnlinkOnClose(false).
 			_ = unlinkUnixSocket(key[2])
+			glog.Infof("close inherited and unlink %s", key[2])
 		}
 		_ = file.Close()
 	}
@@ -462,6 +463,7 @@ func (f *Fds) closeAndRemoveUsed() {
 			// down without having done an upgrade.
 			// This undoes the effect of SetUnlinkOnClose(false).
 			_ = unlinkUnixSocket(key[2])
+			glog.Infof("unlink %s", key[2])
 		}
 		_ = file.Close()
 	}

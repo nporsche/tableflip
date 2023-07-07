@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"flag"
-	"github.com/cloudflare/tableflip"
 	"github.com/golang/glog"
 	"net"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"path/filepath"
 	"sync"
 	"syscall"
+	"tableflip.test.com/tableflip"
 )
 
 func main() {
@@ -27,20 +27,26 @@ func main() {
 	upg, _ := tableflip.New(tableflip.Options{
 		PIDFile: *pidFile,
 	})
-	defer upg.Stop()
 
 	go func() {
 		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGHUP)
-		for range sig {
-			err := upg.Upgrade()
-			if err != nil {
-				glog.Infoln("Upgrade failed:", err)
+		signal.Notify(sig, syscall.SIGHUP, syscall.SIGTERM)
+		for s := range sig {
+			if s == syscall.SIGHUP {
+				err := upg.Upgrade()
+				if err != nil {
+					glog.Infoln("Upgrade failed:", err)
+				}
+			}
+			if s == syscall.SIGTERM {
+				upg.Stop()
+				glog.Infoln("term signal, stopping")
 			}
 		}
 	}()
 
-	ln, err := upg.Fds.ListenWithCallback(*network, *listenAddr, createNewListen)
+	//ln, err := upg.Fds.ListenWithCallback(*network, *listenAddr, createNewListen) //2.46
+	ln, err := createNewListen(*network, *listenAddr) //2.45
 	if err != nil {
 		glog.Fatalln("Can't listen:", err)
 	}
@@ -52,6 +58,7 @@ func main() {
 	if err := upg.Ready(); err != nil {
 		panic(err)
 	}
+
 	<-upg.Exit()
 	glog.Infof("close listener %s:%s", *network, *listenAddr)
 	ln.Close()

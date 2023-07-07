@@ -1,8 +1,8 @@
-module github.com/cloudflare/tableflip
+module tableflip.test.com
 
-go 1.14
+go 1.20
 
 require (
-	github.com/golang/glog v1.1.1 // indirect
-	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4
+	github.com/golang/glog v1.1.1
+	golang.org/x/sys v0.10.0
 )
